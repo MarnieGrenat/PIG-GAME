@@ -1,11 +1,31 @@
 #Author: Gabriela Dellamora Paim
 
-#Version: 16.12.22
+#Version: 13.02.22
 import numpy as np
+import functions as fun
+from time import sleep as sleep
+import os
+import platform
 
-language= str(input('Select your language. write \'E, or English\' for ENGLISH  | Selecione seu idioma. Escreva \'P, ou Portugues\' para Português: '))
+'''Menu'''
 
-if language == 'E' or language == 'e' or language == 'ENGLISH' or language == 'english' or language == 'English':
+
+#arrumar print de mensagem vc perdeu (apagando antes de poder ler)
+
+sis_op=platform.system()
+if sis_op == 'Windows': 
+    comando = 'cls'
+else:
+    comando = 'clear'
+
+os.system(comando)
+player= None
+computer = None
+pp = None
+cp = None
+
+language= fun.define_language()
+if language == 'English':
     texto_explicacao = '''
      ___________________________________________________________________________________________________________________
     |[Gameplay:]                                                                                                        |
@@ -19,15 +39,36 @@ if language == 'E' or language == 'e' or language == 'ENGLISH' or language == 'e
     |___________________________________________________________________________________________________________________|
     '''
     texto_player_name='How you want to be called, player? '
-    texto_hold = 'Wanna hold? (Y/N)'
+    texto_hold = 'Wanna pass your turn? (Y/N)'
+    text_error_hold= 'Answer not registred. Please, rewrite yout decision (Y/N) '
+    
+    texto_pass = 'decided to pass their turn.'
+    text_not_pass='decided to play one more turn.'
+    text_zero_points = ' lost all their points..'
     text_dice = 'The dice rolled: ' 
     text_computer='Computer'   
     text_winner = 'The winner for this match is: '
     text_round = '\'s round]'
-    text_value_one = 'zero point!'
+    text_player_points='player points '
+    text_placar_comp='''
+-----------------------------
+ final points for this turn!!  
+ player {computer}:  {cp}
+-----------------------------
+          '''
+          
+    text_placar_player='''
+-----------------------------
+ final points for this turn!!  
+ player {player}:  {pp}
+-----------------------------
+          ''' 
+    text_pass_round= "Next player's round: "
+    
+
     
     
-if language == 'P' or language == 'p' or language == 'PORTUGUES' or language == 'portugues' or language == 'Portugues':
+if  language == 'Portugues':
     texto_explicacao = '''
      ________________________________________________________________________________________________________________________________
     |[Gameplay:]                                                                                                                     |
@@ -41,23 +82,104 @@ if language == 'P' or language == 'p' or language == 'PORTUGUES' or language == 
     |________________________________________________________________________________________________________________________________|
     '''
     texto_player_name = 'Como deseja se chamar, jogador? '
-    text_hold= 'Deseja segurar? (S/N)'
+    texto_hold= 'Deseja passar a vez? (S/N) '
+    text_zero_points=' perdeu todos seus pontos! Que pena :)'
+    texto_pass = ' decidiu passar sua vez.'
+    text_not_pass = ' decidiu jogar mais uma vez.'
     text_dice = 'O dado rolou o valor: '
     text_computer='Computador'
     text_winner = 'O vencedor desta rodada é: '
-    text_round = '\'s round]'    ############
-    text_value_one = 'Seus pontos foram zerados!'
-
-else:
-    print('Language not identified. Please, restart the game.')
-    
-
+    text_value_one = 'Seus pontos foram zerados! '
+    text_error_hold= 'Resposta não registrada, por favor, reinserir decisão (S/N) '
+    text_player_points= 'Pontos do jogador '
+    text_placar_comp='''
+-----------------------------
+ Pontos finais desta rodada!  
+ JOGADOR {computer}:  {cp}
+-----------------------------
+          '''(computer=computer, cp=cp)
+    text_placar_player='''
+-----------------------------
+ Pontos finais desta rodada!  
+ JOGADOR {player}:  {pp}
+-----------------------------
+          '''
+    text_pass_round= 'Vez do jogador: '
 print(texto_explicacao)
+
+
+'''Jogo'''
+sleep(4)
 player=str(input(texto_player_name))
 computer=text_computer
 pp = 0
 cp = 0
 
-hold = False
-while hold is False:
-    pass
+while cp < 100 or pp < 100:
+    
+    hold = False 
+    while hold == False:
+        add_point = (np.random.randint(low=1,high=7))
+        print(text_dice, add_point)
+        sleep(1)
+        if add_point == 1:
+            pp = 0
+            print(player, text_zero_points)
+            sleep(3)
+            break
+        else:
+            pp += add_point
+            print()
+            print(player,': ', pp)
+            
+            hold = fun.hold_decision(txt_hold=texto_hold, txt_hold_ERROR=text_error_hold)
+            if hold == False:
+                print(player, text_not_pass)
+                sleep(3)
+            else:
+                print(player, texto_pass)
+                sleep(1)    
+    os.system(comando)
+    print(text_placar_player)
+        
+    print(text_pass_round, computer)  
+
+
+    hold = False
+    while hold == False:
+        add_point = (np.random.randint(low=1,high=7))
+        print(text_dice, add_point)
+        if add_point == 1:
+            cp = 0
+            
+            print(computer, text_zero_points)
+            sleep(3)
+            print()
+            break
+        
+        else:
+            cp += add_point
+            print()
+            print(computer,': ', cp)
+            
+            hold = fun.hold_computer(txt_hold=texto_hold, txt_hold_ERROR=text_error_hold)
+            if hold == False:
+                print(computer, text_not_pass)
+                sleep(3)
+            else:
+                print(computer, texto_pass)
+                sleep(1)
+            
+    os.system(comando)
+    print(text_placar_comp)
+    
+    print(text_pass_round, player)  
+    
+
+
+'''ending game'''        
+if pp >= 100:
+    print(text_winner, computer)
+elif cp >= 100:
+    print(text_winner, computer)
+    
